@@ -1,16 +1,17 @@
 import requests
 import json
-from config import token
+from config import token  # load token from non public file
 
-params = {"token": token}
+params = {"token": token}  # dict for wialon params
 
 data = {
     "svc": "token/login",
-    "params": json.dumps(params, ensure_ascii=False)
+    "params": json.dumps(params, ensure_ascii=False)  # to make it clean and convenient, first we create dict for wialon
+    # params and then transform it to string via json's dumps func
 }
 
 r = requests.post("https://hst-api.wialon.com/wialon/ajax.html", data=data)
-data["sid"] = r.json()["eid"]
+data["sid"] = r.json()["eid"]  # get a sid
 
 data["svc"] = "core/search_items"
 params = {
@@ -28,16 +29,25 @@ params = {
 data["params"] = json.dumps(params, ensure_ascii=False)
 
 r = requests.post("https://hst-api.wialon.com/wialon/ajax.html", data=data)
-units = r.json()["items"]
+units = r.json()["items"]  # get all the items to change
 
-data["svc"] = "item/update_name"
-params = {"itemId": 20181251, "name": "77. Камаз к483оо 124 вахта"}
-data["params"] = json.dumps(params, ensure_ascii=False)
-r = requests.post("https://hst-api.wialon.com/wialon/ajax.html", data=data)
-print(r.json())
+# data["svc"] = "item/update_name"
+# params = {"itemId": 20181251, "name": "77. Камаз к483оо 124 вахта"}
+# data["params"] = json.dumps(params, ensure_ascii=False)
+# r = requests.post("https://hst-api.wialon.com/wialon/ajax.html", data=data)
+# print(r.json())  this is when we need to change some single item by it's id
 
 
 def number_changer(start: int, list: dict, sid: str) -> list:
+    '''
+    func to raise by one every number in the begging of the name of every item in the "list"
+    started from "start" including
+
+    items in the list should contain name("nm") and id("id") properties
+
+    it returns list with error string, if they occur
+
+    '''
 
     print(f"Do you really want to rename items from {start}?(Yes/no)")
     if input() != "Yes":
@@ -76,6 +86,7 @@ def number_changer(start: int, list: dict, sid: str) -> list:
 
 errors = number_changer(77, units, data["sid"])
 print("---------------------------------")
+print("Errors:")
 for error in errors:
     print(error)
 
